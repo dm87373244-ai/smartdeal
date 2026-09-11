@@ -1,0 +1,13 @@
+### Update Product
+PUT http://localhost:8080/api/products/4
+Content-Type: application/json
+
+{
+  "name": "Samsung Galaxy S24",
+  "category": "Mobile",
+  "price": 52000,
+  "rating": 4.5,
+  "marketplace": "Amazon",
+  "image": "s24.jpg",
+  "productUrl": "https://example.com/s24"
+}

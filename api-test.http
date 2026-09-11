@@ -1,0 +1,17 @@
+POST http://localhost:8080/api/products
+Content-Type: application/json
+GET http://localhost:8080/api/products
+
+
+{
+  "name": "iPhone 15",
+  "category": "Mobile",
+  "price": 50000,
+  "rating": 4.5,
+  "marketplace": "Amazon",
+  "image": "iphone15.jpg",
+  "productUrl": "https://example.com/iphone15"
+}
+
+
+
