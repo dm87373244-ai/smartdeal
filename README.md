@@ -1,45 +1,59 @@
-# SmartDeal
+# SmartDeal 🛒
 
-SmartDeal is a product comparison platform that helps users find highly-rated products at competitive prices across different e-commerce platforms.
+SmartDeal is a full-stack product comparison platform designed to help users discover highly-rated products and compare prices in one place.
+
+The project combines a Spring Boot backend, MySQL database, and Next.js frontend to provide product search and deal comparison functionality.
 
 ## 🚀 Features
 
-- Compare products from multiple platforms
-- Filter products by rating
-- Find the cheapest available product
-- Search products by name
-- REST API based backend
-- MySQL database integration
+- 🔍 Search products dynamically
+- ⭐ Show highly-rated products
+- 💰 Compare product prices
+- 🏆 Identify the lowest-price deal
+- 📦 Product details
+- 🌐 REST APIs with Spring Boot
+- 🗄️ MySQL database integration
+- ⚡ Modern Next.js frontend
+- 📱 Responsive user interface
+- 🔗 External product details integration
 
 ## 🛠️ Tech Stack
 
+### Backend
 - Java
 - Spring Boot
 - Spring Data JPA
+- REST API
 - MySQL
 - Maven
-- REST API
 
-## 📌 API Endpoints
+### Frontend
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/products` | Get all products |
-| GET | `/api/products/top-rated` | Get highly-rated products |
-| GET | `/api/products/cheapest/{name}` | Find cheapest product |
-| GET | `/api/products/search/{name}` | Search products |
-| POST | `/api/products` | Add a product |
+### Tools
+- IntelliJ IDEA
+- Git
+- GitHub
 
-## ▶️ How to Run
+## 📂 Project Structure
 
-1. Clone the repository
-2. Configure MySQL
-3. Create a database named `smartdeal`
-4. Configure your database credentials locally
-5. Run the Spring Boot application
-
-## 📚 Project Status
-
-SmartDeal is currently under development.
-
-More features and the frontend will be added soon.
+```text
+smartdeal/
+│
+├── frontend/
+│   ├── app/
+│   ├── public/
+│   ├── package.json
+│   └── next.config.ts
+│
+├── src/
+│   └── main/
+│       └── java/
+│           └── com/
+│               └── smartdeal/
+│
+├── pom.xml
+└── README.md
