@@ -1,8 +1,11 @@
 package com.smartdeal.service;
 
+import com.smartdeal.dto.ApiProduct;
+import com.smartdeal.dto.ApiProductResponse;
 import com.smartdeal.entity.Product;
 import com.smartdeal.repository.ProductRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -13,9 +16,14 @@ import java.util.Set;
 public class ProductService {
 
     private final ProductRepository repository;
+    private final RestClient restClient;
 
     public ProductService(ProductRepository repository) {
         this.repository = repository;
+
+        this.restClient = RestClient.builder()
+                .baseUrl("https://dummyjson.com")
+                .build();
     }
 
     // ================= GET ALL PRODUCTS =================
@@ -45,7 +53,6 @@ public class ProductService {
 
         String searchText = normalizeText(name);
 
-        // Common words remove karo
         Set<String> ignoredWords = Set.of(
                 "apple",
                 "mobile",
@@ -60,11 +67,7 @@ public class ProductService {
 
         return repository.findAll()
                 .stream()
-
-                // Rating 3.5+ only
                 .filter(product -> product.getRating() >= 3.5)
-
-                // Search keywords match
                 .filter(product -> {
 
                     String productName =
@@ -73,10 +76,7 @@ public class ProductService {
                     return keywords.stream()
                             .allMatch(productName::contains);
                 })
-
-                // Cheapest first
                 .sorted(Comparator.comparingDouble(Product::getPrice))
-
                 .toList();
     }
 
@@ -99,15 +99,15 @@ public class ProductService {
 
     // ================= RELATED PRODUCTS =================
     public List<Product> getRelatedProducts(String name) {
-
-        // Related products bhi smart search use karenge
         return searchProducts(name);
     }
 
     // ================= ADD PRODUCT =================
     public Product addProduct(Product product) {
 
-        if (product.getRating() < 3.5 || product.getRating() > 5.0) {
+        if (product.getRating() < 3.5 ||
+                product.getRating() > 5.0) {
+
             throw new IllegalArgumentException(
                     "Product rating must be between 3.5 and 5.0"
             );
@@ -119,8 +119,9 @@ public class ProductService {
     // ================= UPDATE PRODUCT =================
     public Product updateProduct(Long id, Product newProduct) {
 
-        // Rating validation
-        if (newProduct.getRating() < 3.5 || newProduct.getRating() > 5.0) {
+        if (newProduct.getRating() < 3.5 ||
+                newProduct.getRating() > 5.0) {
+
             throw new IllegalArgumentException(
                     "Product rating must be between 3.5 and 5.0"
             );
@@ -129,12 +130,10 @@ public class ProductService {
         Product existingProduct =
                 repository.findById(id).orElse(null);
 
-        // Product nahi mila
         if (existingProduct == null) {
             return null;
         }
 
-        // Existing product ki details update karo
         existingProduct.setName(newProduct.getName());
         existingProduct.setCategory(newProduct.getCategory());
         existingProduct.setPrice(newProduct.getPrice());
@@ -143,19 +142,16 @@ public class ProductService {
         existingProduct.setImage(newProduct.getImage());
         existingProduct.setProductUrl(newProduct.getProductUrl());
 
-        // Updated product database me save karo
         return repository.save(existingProduct);
     }
 
     // ================= DELETE PRODUCT =================
     public String deleteProduct(Long id) {
 
-        // Product exist karta hai ya nahi
         if (!repository.existsById(id)) {
             return "Product not found";
         }
 
-        // Product delete karo
         repository.deleteById(id);
 
         return "Product deleted successfully";
@@ -168,30 +164,52 @@ public class ProductService {
             return "";
         }
 
-        // Extra spaces remove
         text = text.trim();
-
-        // Lowercase
         text = text.toLowerCase();
 
-        // iphone15 -> iphone 15
         text = text.replaceAll(
                 "([a-zA-Z])([0-9])",
                 "$1 $2"
         );
 
-        // 15iphone -> 15 iphone
         text = text.replaceAll(
                 "([0-9])([a-zA-Z])",
                 "$1 $2"
         );
 
-        // Multiple spaces -> single space
         text = text.replaceAll(
                 "\\s+",
                 " "
         );
 
         return text;
+    }
+
+    // ================= DUMMY JSON API =================
+    public List<ApiProduct> searchFromApi(String name) {
+
+        ApiProductResponse response = restClient.get()
+                .uri("/products/search?q={name}", name)
+                .retrieve()
+                .body(ApiProductResponse.class);
+
+        if (response == null ||
+                response.getProducts() == null) {
+
+            return List.of();
+        }
+
+        return response.getProducts()
+                .stream()
+                .filter(product ->
+                        product.getRating() != null &&
+                                product.getRating() >= 3.5
+                )
+                .sorted(
+                        Comparator.comparingDouble(
+                                ApiProduct::getPrice
+                        )
+                )
+                .toList();
     }
 }
