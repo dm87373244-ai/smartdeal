@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,7 +35,7 @@
 
         .hero {
             text-align: center;
-            padding: 80px 20px;
+            padding: 60px 20px;
             background: white;
         }
 
@@ -66,6 +67,65 @@
         .products h2 {
             font-size: 30px;
         }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+
+        .product-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+        }
+
+        .product-card h3 {
+            margin: 15px 0 8px;
+        }
+
+        .price {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2874f0;
+        }
+
+        .rating {
+            color: #f39c12;
+            margin: 8px 0;
+        }
+
+        .marketplace {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .buy-btn {
+            display: inline-block;
+            padding: 10px 18px;
+            background: #2874f0;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        #loading {
+            color: #666;
+        }
+
+        #error {
+            color: red;
+        }
     </style>
 </head>
 
@@ -76,7 +136,7 @@
 
     <nav>
         <a href="/">Home</a>
-        <a href="#">Products</a>
+        <a href="#products">Products</a>
         <a href="#">Login</a>
         <a href="#">Cart</a>
     </nav>
@@ -86,13 +146,71 @@
     <h1>Welcome to SmartDeal 🛍️</h1>
     <p>Best Deals. Best Products. Best Prices.</p>
 
-    <a href="#" class="btn">Shop Now</a>
+    <a href="#products" class="btn">Shop Now</a>
 </section>
 
-<section class="products">
+<section class="products" id="products">
     <h2>Featured Products</h2>
-    <p>Products will appear here soon...</p>
+
+    <p id="loading">Loading products...</p>
+    <p id="error"></p>
+
+    <div class="product-grid" id="productGrid"></div>
 </section>
+
+<script>
+    fetch("/api/products")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to load products");
+            }
+            return response.json();
+        })
+        .then(products => {
+
+            document.getElementById("loading").style.display = "none";
+
+            const productGrid = document.getElementById("productGrid");
+
+            products.forEach(product => {
+
+                const card = document.createElement("div");
+                card.className = "product-card";
+
+                card.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+
+                    <h3>${product.name}</h3>
+
+                    <div class="price">
+                        ₹${Number(product.price).toLocaleString("en-IN")}
+                    </div>
+
+                    <div class="rating">
+                        ⭐ ${product.rating}
+                    </div>
+
+                    <div class="marketplace">
+                        Available on ${product.marketplace}
+                    </div>
+
+                    <a class="buy-btn"
+                       href="${product.productUrl}"
+                       target="_blank">
+                        Buy Now
+                    </a>
+                `;
+
+                productGrid.appendChild(card);
+            });
+        })
+        .catch(error => {
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("error").textContent =
+                "Products load nahi ho paaye.";
+            console.error(error);
+        });
+</script>
 
 </body>
 </html>
