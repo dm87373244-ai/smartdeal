@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,10 +6,30 @@
     <title>SmartDeal</title>
 
     <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        header {
+            background: #2874f0;
+            color: white;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
         .search-box {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
         }
 
         .search-box input {
@@ -28,25 +47,6 @@
             color: #2874f0;
             font-weight: bold;
             cursor: pointer;
-        }
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-        }
-
-        header {
-            background: #2874f0;
-            color: white;
-            padding: 20px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
         }
 
         nav a {
@@ -88,6 +88,28 @@
 
         .products h2 {
             font-size: 30px;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #2874f0;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .filter-btn:hover {
+            opacity: 0.9;
         }
 
         .product-grid {
@@ -154,9 +176,15 @@
 <body>
 
 <header>
+
     <div class="logo">SmartDeal</div>
+
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search products...">
+        <input
+                type="text"
+                id="searchInput"
+                placeholder="Search products..."
+        >
         <button onclick="searchProducts()">Search</button>
     </div>
 
@@ -166,61 +194,227 @@
         <a href="#">Login</a>
         <a href="#">Cart</a>
     </nav>
+
 </header>
 
 <section class="hero">
+
     <h1>Welcome to SmartDeal 🛍️</h1>
+
     <p>Best Deals. Best Products. Best Prices.</p>
 
-    <a href="#products" class="btn">Shop Now</a>
+    <a href="#products" class="btn">
+        Shop Now
+    </a>
+
 </section>
 
 <section class="products" id="products">
+
     <h2>Featured Products</h2>
 
-    <p id="loading">Loading products...</p>
+    <!-- Category Filters -->
+
+    <div class="filters">
+
+        <button
+                class="filter-btn"
+                onclick="filterProducts('all')">
+            All
+        </button>
+
+        <button
+                class="filter-btn"
+                onclick="filterProducts('Mobiles')">
+            Mobiles
+        </button>
+
+        <button
+                class="filter-btn"
+                onclick="filterProducts('Headphones')">
+            Headphones
+        </button>
+
+    </div>
+
+    <p id="loading">
+        Loading products...
+    </p>
+
     <p id="error"></p>
 
-    <div class="product-grid" id="productGrid"></div>
+    <div
+            class="product-grid"
+            id="productGrid">
+    </div>
+
 </section>
 
 <script>
+
+    let allProducts = [];
+
+    let selectedCategory = "all";
+
+
+    // Search Products
+
     function searchProducts() {
-        const searchText = document.getElementById("searchInput").value.toLowerCase().trim();
-        const cards = document.querySelectorAll(".product-card");
+
+        const searchText =
+            document
+                .getElementById("searchInput")
+                .value
+                .toLowerCase()
+                .trim();
+
+        const cards =
+            document.querySelectorAll(".product-card");
+
 
         cards.forEach(card => {
-            const productName = card.querySelector("h3").textContent.toLowerCase();
 
-            if (productName.includes(searchText)) {
+            const productName =
+                card
+                    .querySelector("h3")
+                    .textContent
+                    .toLowerCase();
+
+            const productCategory =
+                card.dataset.category;
+
+
+            const matchesSearch =
+                productName.includes(searchText);
+
+            const matchesCategory =
+                selectedCategory === "all" ||
+                productCategory === selectedCategory;
+
+
+            if (matchesSearch && matchesCategory) {
+
                 card.style.display = "block";
+
             } else {
+
                 card.style.display = "none";
+
             }
+
         });
+
     }
-    fetch("/api/products")
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Failed to load products");
+
+
+    // Category Filter
+
+    function filterProducts(category) {
+
+        selectedCategory = category;
+
+        const searchText =
+            document
+                .getElementById("searchInput")
+                .value
+                .toLowerCase()
+                .trim();
+
+        const cards =
+            document.querySelectorAll(".product-card");
+
+
+        cards.forEach(card => {
+
+            const productName =
+                card
+                    .querySelector("h3")
+                    .textContent
+                    .toLowerCase();
+
+            const productCategory =
+                card.dataset.category;
+
+
+            const matchesSearch =
+                productName.includes(searchText);
+
+            const matchesCategory =
+                category === "all" ||
+                productCategory === category;
+
+
+            if (matchesSearch && matchesCategory) {
+
+                card.style.display = "block";
+
+            } else {
+
+                card.style.display = "none";
+
             }
+
+        });
+
+    }
+
+
+    // Load Products
+
+    fetch("/api/products")
+
+        .then(response => {
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to load products"
+                );
+
+            }
+
             return response.json();
+
         })
+
         .then(products => {
 
-            document.getElementById("loading").style.display = "none";
+            allProducts = products;
 
-            const productGrid = document.getElementById("productGrid");
+            document
+                .getElementById("loading")
+                .style.display = "none";
+
+
+            const productGrid =
+                document.getElementById("productGrid");
+
 
             products.forEach(product => {
 
-                const card = document.createElement("div");
-                card.className = "product-card";
+                const card =
+                    document.createElement("div");
+
+                card.className =
+                    "product-card";
+
+
+                // Store category in card
+
+                card.dataset.category =
+                    product.category;
+
 
                 card.innerHTML = `
-                    <img src="${product.image}" alt="${product.name}">
 
-                    <h3>${product.name}</h3>
+                    <img
+                        src="${product.image}"
+                        alt="${product.name}"
+                    >
+
+                    <h3>
+                        ${product.name}
+                    </h3>
 
                     <div class="price">
                         ₹${Number(product.price).toLocaleString("en-IN")}
@@ -234,22 +428,37 @@
                         Available on ${product.marketplace}
                     </div>
 
-                    <a class="buy-btn"
-                       href="${product.productUrl}"
-                       target="_blank">
+                    <a
+                        class="buy-btn"
+                        href="${product.productUrl}"
+                        target="_blank">
                         Buy Now
                     </a>
+
                 `;
 
+
                 productGrid.appendChild(card);
+
             });
+
         })
+
         .catch(error => {
-            document.getElementById("loading").style.display = "none";
-            document.getElementById("error").textContent =
+
+            document
+                .getElementById("loading")
+                .style.display = "none";
+
+            document
+                .getElementById("error")
+                .textContent =
                 "Products load nahi ho paaye.";
+
             console.error(error);
+
         });
+
 </script>
 
 </body>
