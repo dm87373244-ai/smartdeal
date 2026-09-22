@@ -94,7 +94,7 @@
             display: flex;
             justify-content: center;
             gap: 12px;
-            margin: 25px 0;
+            margin: 25px 0 15px;
             flex-wrap: wrap;
         }
 
@@ -110,6 +110,28 @@
 
         .filter-btn:hover {
             opacity: 0.9;
+        }
+
+        /* Price Sorting */
+
+        .sort-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0 30px;
+        }
+
+        .sort-box label {
+            font-weight: bold;
+        }
+
+        .sort-box select {
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: white;
+            cursor: pointer;
         }
 
         .product-grid {
@@ -185,7 +207,10 @@
                 id="searchInput"
                 placeholder="Search products..."
         >
-        <button onclick="searchProducts()">Search</button>
+
+        <button onclick="searchProducts()">
+            Search
+        </button>
     </div>
 
     <nav>
@@ -196,6 +221,7 @@
     </nav>
 
 </header>
+
 
 <section class="hero">
 
@@ -209,9 +235,11 @@
 
 </section>
 
+
 <section class="products" id="products">
 
     <h2>Featured Products</h2>
+
 
     <!-- Category Filters -->
 
@@ -237,11 +265,42 @@
 
     </div>
 
+
+    <!-- Price Sorting -->
+
+    <div class="sort-box">
+
+        <label for="sortSelect">
+            Sort by:
+        </label>
+
+        <select
+                id="sortSelect"
+                onchange="sortProducts()">
+
+            <option value="default">
+                Default
+            </option>
+
+            <option value="low">
+                Price: Low to High
+            </option>
+
+            <option value="high">
+                Price: High to Low
+            </option>
+
+        </select>
+
+    </div>
+
+
     <p id="loading">
         Loading products...
     </p>
 
     <p id="error"></p>
+
 
     <div
             class="product-grid"
@@ -249,6 +308,7 @@
     </div>
 
 </section>
+
 
 <script>
 
@@ -261,48 +321,7 @@
 
     function searchProducts() {
 
-        const searchText =
-            document
-                .getElementById("searchInput")
-                .value
-                .toLowerCase()
-                .trim();
-
-        const cards =
-            document.querySelectorAll(".product-card");
-
-
-        cards.forEach(card => {
-
-            const productName =
-                card
-                    .querySelector("h3")
-                    .textContent
-                    .toLowerCase();
-
-            const productCategory =
-                card.dataset.category;
-
-
-            const matchesSearch =
-                productName.includes(searchText);
-
-            const matchesCategory =
-                selectedCategory === "all" ||
-                productCategory === selectedCategory;
-
-
-            if (matchesSearch && matchesCategory) {
-
-                card.style.display = "block";
-
-            } else {
-
-                card.style.display = "none";
-
-            }
-
-        });
+        applyFilters();
 
     }
 
@@ -313,6 +332,47 @@
 
         selectedCategory = category;
 
+        applyFilters();
+
+    }
+
+
+    // Price Sorting
+
+    function sortProducts() {
+
+        const sortValue =
+            document
+                .getElementById("sortSelect")
+                .value;
+
+
+        if (sortValue === "low") {
+
+            allProducts.sort(
+                (a, b) => a.price - b.price
+            );
+
+        }
+
+        else if (sortValue === "high") {
+
+            allProducts.sort(
+                (a, b) => b.price - a.price
+            );
+
+        }
+
+
+        renderProducts();
+
+    }
+
+
+    // Apply Search + Category
+
+    function applyFilters() {
+
         const searchText =
             document
                 .getElementById("searchInput")
@@ -320,39 +380,92 @@
                 .toLowerCase()
                 .trim();
 
-        const cards =
-            document.querySelectorAll(".product-card");
+
+        const filteredProducts =
+            allProducts.filter(product => {
+
+                const matchesSearch =
+                    product.name
+                        .toLowerCase()
+                        .includes(searchText);
 
 
-        cards.forEach(card => {
-
-            const productName =
-                card
-                    .querySelector("h3")
-                    .textContent
-                    .toLowerCase();
-
-            const productCategory =
-                card.dataset.category;
+                const matchesCategory =
+                    selectedCategory === "all" ||
+                    product.category === selectedCategory;
 
 
-            const matchesSearch =
-                productName.includes(searchText);
+                return (
+                    matchesSearch &&
+                    matchesCategory
+                );
 
-            const matchesCategory =
-                category === "all" ||
-                productCategory === category;
+            });
 
 
-            if (matchesSearch && matchesCategory) {
+        renderProducts(filteredProducts);
 
-                card.style.display = "block";
+    }
 
-            } else {
 
-                card.style.display = "none";
+    // Render Products
 
-            }
+    function renderProducts(productsToRender = allProducts) {
+
+        const productGrid =
+            document.getElementById("productGrid");
+
+
+        productGrid.innerHTML = "";
+
+
+        productsToRender.forEach(product => {
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "product-card";
+
+
+            card.dataset.category =
+                product.category;
+
+
+            card.innerHTML = `
+
+                <img
+                    src="${product.image}"
+                    alt="${product.name}"
+                >
+
+                <h3>
+                    ${product.name}
+                </h3>
+
+                <div class="price">
+                    ₹${Number(product.price).toLocaleString("en-IN")}
+                </div>
+
+                <div class="rating">
+                    ⭐ ${product.rating}
+                </div>
+
+                <div class="marketplace">
+                    Available on ${product.marketplace}
+                </div>
+
+                <a
+                    class="buy-btn"
+                    href="${product.productUrl}"
+                    target="_blank">
+                    Buy Now
+                </a>
+
+            `;
+
+
+            productGrid.appendChild(card);
 
         });
 
@@ -381,66 +494,13 @@
 
             allProducts = products;
 
+
             document
                 .getElementById("loading")
                 .style.display = "none";
 
 
-            const productGrid =
-                document.getElementById("productGrid");
-
-
-            products.forEach(product => {
-
-                const card =
-                    document.createElement("div");
-
-                card.className =
-                    "product-card";
-
-
-                // Store category in card
-
-                card.dataset.category =
-                    product.category;
-
-
-                card.innerHTML = `
-
-                    <img
-                        src="${product.image}"
-                        alt="${product.name}"
-                    >
-
-                    <h3>
-                        ${product.name}
-                    </h3>
-
-                    <div class="price">
-                        ₹${Number(product.price).toLocaleString("en-IN")}
-                    </div>
-
-                    <div class="rating">
-                        ⭐ ${product.rating}
-                    </div>
-
-                    <div class="marketplace">
-                        Available on ${product.marketplace}
-                    </div>
-
-                    <a
-                        class="buy-btn"
-                        href="${product.productUrl}"
-                        target="_blank">
-                        Buy Now
-                    </a>
-
-                `;
-
-
-                productGrid.appendChild(card);
-
-            });
+            renderProducts();
 
         })
 
@@ -450,10 +510,12 @@
                 .getElementById("loading")
                 .style.display = "none";
 
+
             document
                 .getElementById("error")
                 .textContent =
                 "Products load nahi ho paaye.";
+
 
             console.error(error);
 
