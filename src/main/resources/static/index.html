@@ -1,3 +1,4 @@
+</body>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1528,5 +1529,578 @@
 
 </script>
 
-</body>
+<!-- AUTH MODAL -->
+<div id="authModal" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    z-index:9999;
+    align-items:center;
+    justify-content:center;
+">
+
+    <div style="
+        background:white;
+        width:90%;
+        max-width:420px;
+        padding:30px;
+        border-radius:12px;
+        position:relative;
+        box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    ">
+
+        <button onclick="closeAuthModal()" style="
+            position:absolute;
+            right:15px;
+            top:10px;
+            border:none;
+            background:none;
+            font-size:25px;
+            cursor:pointer;
+        ">×</button>
+
+        <h2 id="authTitle" style="margin-top:0;">
+            Login
+        </h2>
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm">
+
+            <input
+                type="email"
+                id="loginEmail"
+                placeholder="Email"
+                required
+                style="
+                    width:100%;
+                    padding:12px;
+                    margin:8px 0;
+                    border:1px solid #ccc;
+                    border-radius:6px;
+                "
+            >
+
+            <input
+                type="password"
+                id="loginPassword"
+                placeholder="Password"
+                required
+                style="
+                    width:100%;
+                    padding:12px;
+                    margin:8px 0;
+                    border:1px solid #ccc;
+                    border-radius:6px;
+                "
+            >
+
+            <button type="submit" style="
+                width:100%;
+                padding:12px;
+                margin-top:10px;
+                border:none;
+                border-radius:6px;
+                background:#2874f0;
+                color:white;
+                font-weight:bold;
+                cursor:pointer;
+            ">
+                Login
+            </button>
+
+        </form>
+
+        <!-- SIGNUP FORM -->
+        <form id="signupForm" style="display:none;">
+
+            <input
+                type="text"
+                id="signupName"
+                placeholder="Full Name"
+                required
+                style="
+                    width:100%;
+                    padding:12px;
+                    margin:8px 0;
+                    border:1px solid #ccc;
+                    border-radius:6px;
+                "
+            >
+
+            <input
+                type="email"
+                id="signupEmail"
+                placeholder="Email"
+                required
+                style="
+                    width:100%;
+                    padding:12px;
+                    margin:8px 0;
+                    border:1px solid #ccc;
+                    border-radius:6px;
+                "
+            >
+
+            <input
+                type="password"
+                id="signupPassword"
+                placeholder="Password"
+                required
+                minlength="6"
+                style="
+                    width:100%;
+                    padding:12px;
+                    margin:8px 0;
+                    border:1px solid #ccc;
+                    border-radius:6px;
+                "
+            >
+
+            <button type="submit" style="
+                width:100%;
+                padding:12px;
+                margin-top:10px;
+                border:none;
+                border-radius:6px;
+                background:#2874f0;
+                color:white;
+                font-weight:bold;
+                cursor:pointer;
+            ">
+                Create Account
+            </button>
+
+        </form>
+
+        <p
+            id="authMessage"
+            style="
+                text-align:center;
+                margin-top:15px;
+                font-weight:bold;
+            "
+        ></p>
+
+        <p style="text-align:center;">
+
+            <span id="authSwitchText">
+                Don't have an account?
+            </span>
+
+            <button
+                id="authSwitchButton"
+                onclick="toggleAuthMode()"
+                style="
+                    border:none;
+                    background:none;
+                    color:#2874f0;
+                    font-weight:bold;
+                    cursor:pointer;
+                "
+            >
+                Signup
+            </button>
+
+        </p>
+
+    </div>
+</div>
+
+
+<script>
+
+// ===============================
+// AUTHENTICATION
+// ===============================
+
+let isLoginMode = true;
+
+
+// Open Login
+function openLogin(event) {
+
+    if (event) {
+        event.preventDefault();
+    }
+
+    isLoginMode = true;
+
+    updateAuthModal();
+
+    document.getElementById("authModal").style.display = "flex";
+}
+
+
+// Close Login / Signup
+function closeAuthModal() {
+
+    document.getElementById("authModal").style.display = "none";
+
+    document.getElementById("authMessage").textContent = "";
+
+}
+
+
+// Switch Login / Signup
+function toggleAuthMode() {
+
+    isLoginMode = !isLoginMode;
+
+    updateAuthModal();
+
+}
+
+
+// Update Modal
+function updateAuthModal() {
+
+    const title =
+        document.getElementById("authTitle");
+
+    const loginForm =
+        document.getElementById("loginForm");
+
+    const signupForm =
+        document.getElementById("signupForm");
+
+    const switchText =
+        document.getElementById("authSwitchText");
+
+    const switchButton =
+        document.getElementById("authSwitchButton");
+
+    const message =
+        document.getElementById("authMessage");
+
+
+    message.textContent = "";
+
+
+    if (isLoginMode) {
+
+        title.textContent = "Login";
+
+        loginForm.style.display = "block";
+
+        signupForm.style.display = "none";
+
+        switchText.textContent =
+            "Don't have an account?";
+
+        switchButton.textContent =
+            "Signup";
+
+    } else {
+
+        title.textContent = "Create Account";
+
+        loginForm.style.display = "none";
+
+        signupForm.style.display = "block";
+
+        switchText.textContent =
+            "Already have an account?";
+
+        switchButton.textContent =
+            "Login";
+
+    }
+
+}
+
+
+// ===============================
+// LOGIN
+// ===============================
+
+document
+    .getElementById("loginForm")
+    .addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+
+        const email =
+            document
+                .getElementById("loginEmail")
+                .value
+                .trim();
+
+        const password =
+            document
+                .getElementById("loginPassword")
+                .value;
+
+
+        const message =
+            document.getElementById("authMessage");
+
+
+        message.textContent =
+            "Logging in...";
+
+
+        try {
+
+            const response =
+                await fetch("/api/auth/login", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+
+                });
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "Login failed"
+                );
+
+            }
+
+
+            // Save logged-in user
+            localStorage.setItem(
+                "smartdealUser",
+                JSON.stringify(data)
+            );
+
+
+            message.textContent =
+                "Login successful!";
+
+
+            setTimeout(() => {
+
+                closeAuthModal();
+
+                updateUserUI();
+
+            }, 700);
+
+
+        } catch (error) {
+
+            message.textContent =
+                error.message;
+
+        }
+
+    });
+
+
+// ===============================
+// SIGNUP
+// ===============================
+
+document
+    .getElementById("signupForm")
+    .addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+
+        const name =
+            document
+                .getElementById("signupName")
+                .value
+                .trim();
+
+        const email =
+            document
+                .getElementById("signupEmail")
+                .value
+                .trim();
+
+        const password =
+            document
+                .getElementById("signupPassword")
+                .value;
+
+
+        const message =
+            document.getElementById("authMessage");
+
+
+        message.textContent =
+            "Creating account...";
+
+
+        try {
+
+            const response =
+                await fetch("/api/auth/signup", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        password: password
+                    })
+
+                });
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "Signup failed"
+                );
+
+            }
+
+
+            localStorage.setItem(
+                "smartdealUser",
+                JSON.stringify(data)
+            );
+
+
+            message.textContent =
+                "Account created successfully!";
+
+
+            setTimeout(() => {
+
+                closeAuthModal();
+
+                updateUserUI();
+
+            }, 700);
+
+
+        } catch (error) {
+
+            message.textContent =
+                error.message;
+
+        }
+
+    });
+
+
+// ===============================
+// USER UI
+// ===============================
+
+function updateUserUI() {
+
+    const user =
+        JSON.parse(
+            localStorage.getItem("smartdealUser")
+        );
+
+
+    // Find Login link
+    const links =
+        document.querySelectorAll("nav a");
+
+
+    let loginLink = null;
+
+
+    links.forEach(link => {
+
+        if (
+            link.textContent
+                .trim()
+                .toLowerCase()
+                === "login"
+        ) {
+
+            loginLink = link;
+
+        }
+
+    });
+
+
+    if (!loginLink) {
+        return;
+    }
+
+
+    if (user) {
+
+        loginLink.textContent =
+            "Logout (" + user.name + ")";
+
+        loginLink.onclick =
+            function(event) {
+
+                event.preventDefault();
+
+                logoutUser();
+
+            };
+
+    } else {
+
+        loginLink.textContent =
+            "Login";
+
+        loginLink.onclick =
+            openLogin;
+
+    }
+
+}
+
+
+// ===============================
+// LOGOUT
+// ===============================
+
+function logoutUser() {
+
+    localStorage.removeItem(
+        "smartdealUser"
+    );
+
+    alert("Logged out successfully.");
+
+    updateUserUI();
+
+}
+
+
+// ===============================
+// INITIALIZE AUTH
+// ===============================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        updateUserUI();
+
+    }
+);
+
+</script></body>
 </html>
